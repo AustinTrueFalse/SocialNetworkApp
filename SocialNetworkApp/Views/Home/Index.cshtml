@@ -1,52 +1,24 @@
-﻿@{
+﻿﻿@using Microsoft.AspNetCore.Identity;
+@model SocialNetworkApp.ViewModels.Account.MainViewModel;
+
+@{
     ViewData["Title"] = "Home Page";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="main-container">
-    <div class="app-description">
-        Самая клевая соц.сеть
+<div class="row">
+    <div class="side">
+        <div class="center">
+            Пользуйтесь нашей самой крутой соцсетью! Регистрируйтесь всего за 2 минуты, делитесь мыслями, находите новых друзей.
+        </div>
+        
     </div>
-    <div class="app-authorization">
-        <div class="enter-header">
-            Вход в приложение
-        </div>
-        <br />
-        <div class="autorization-form">
-            <div class="email-input">
-                <input type="text" placeholder="Email">
-            </div>
-            <br />
-            <div class="password-input">
-                <input type="text" placeholder="Password">
-            </div>
-            <br />
-            <div class="remember-me">
-                Запомнить?
-                <input type="checkbox">
-            </div>
-            <div class="enter">
-                <button>Войти</button>
-            </div>
-        </div>
-        <div class="registration-header">
-            Регистрация нового пользователя
-        </div>
-        <br />
-        <div class="autorization-form">
-            <div class="name-input">
-                <input type="text" placeholder="Имя">
-            </div>
-            <br />
-            <div class="lastname-input">
-                <input type="text" placeholder="Фамилия">
-            </div>
-            <br />
-            <div class="registration">
-                <button>Регистрация</button>
-            </div>
-        </div>
+
+    <div class="main">
+        <partial name="Login" model="Model.LoginView" />
+        <partial name="Register" model="Model.RegisterView" />
     </div>
-    
+
 </div>
 
 
