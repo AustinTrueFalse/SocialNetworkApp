@@ -160,6 +160,33 @@ namespace SocialNetworkApp.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Mesages",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Text = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SenderId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    RecipientId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Mesages", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Mesages_AspNetUsers_RecipientId",
+                        column: x => x.RecipientId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Mesages_AspNetUsers_SenderId",
+                        column: x => x.SenderId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UserFriends",
                 columns: table => new
                 {
@@ -225,6 +252,16 @@ namespace SocialNetworkApp.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Mesages_RecipientId",
+                table: "Mesages",
+                column: "RecipientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Mesages_SenderId",
+                table: "Mesages",
+                column: "SenderId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UserFriends_CurrentFriendId",
                 table: "UserFriends",
                 column: "CurrentFriendId");
@@ -251,6 +288,9 @@ namespace SocialNetworkApp.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "Mesages");
 
             migrationBuilder.DropTable(
                 name: "UserFriends");

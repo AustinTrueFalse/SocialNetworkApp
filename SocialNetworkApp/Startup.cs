@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SocialNetworkApp.Extentions;
 using SocialNetworkApp.Models.Users;
 using SocialNetworkApp.Repos;
 using SocialNetworkApp.UoW;
@@ -42,7 +43,8 @@ namespace SocialNetworkApp
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connection));
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-            services.AddScoped<FriendsRepository>(); // Добавляем FriendsRepository
+            services.AddCustomRepository<Message, MessageRepository>();
+            services.AddCustomRepository<Friend, FriendsRepository>();
             services.AddControllersWithViews();
             services.AddIdentity<User, IdentityRole>(opts => {
                 opts.Password.RequiredLength = 5;

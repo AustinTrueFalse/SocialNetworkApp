@@ -10,7 +10,7 @@ using SocialNetworkApp;
 namespace SocialNetworkApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240525080159_InitialCreate")]
+    [Migration("20240525093313_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -176,6 +176,33 @@ namespace SocialNetworkApp.Migrations
                     b.ToTable("UserFriends");
                 });
 
+            modelBuilder.Entity("SocialNetworkApp.Models.Users.Message", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:IdentityIncrement", 1)
+                        .HasAnnotation("SqlServer:IdentitySeed", 1)
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("RecipientId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("SenderId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Text")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RecipientId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("Mesages");
+                });
+
             modelBuilder.Entity("SocialNetworkApp.Models.Users.User", b =>
                 {
                     b.Property<string>("Id")
@@ -326,6 +353,21 @@ namespace SocialNetworkApp.Migrations
                     b.Navigation("CurrentFriend");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("SocialNetworkApp.Models.Users.Message", b =>
+                {
+                    b.HasOne("SocialNetworkApp.Models.Users.User", "Recipient")
+                        .WithMany()
+                        .HasForeignKey("RecipientId");
+
+                    b.HasOne("SocialNetworkApp.Models.Users.User", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId");
+
+                    b.Navigation("Recipient");
+
+                    b.Navigation("Sender");
                 });
 #pragma warning restore 612, 618
         }

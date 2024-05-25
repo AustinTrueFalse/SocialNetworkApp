@@ -18,7 +18,7 @@ namespace SocialNetworkApp
             base.OnModelCreating(builder);
 
             builder.ApplyConfiguration(new FriendConfiguration());
-          
+            builder.ApplyConfiguration(new MessageConfuiguration());
         }
     }
 }
