@@ -10,6 +10,7 @@ namespace SocialNetworkApp.ViewModels.Account
         public UserViewModel(User user)
         {
             User = user;
+            Friends = new List<User>();
         }
 
         public List<User> Friends { get; set; }

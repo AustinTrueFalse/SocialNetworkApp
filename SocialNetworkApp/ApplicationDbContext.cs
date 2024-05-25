@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using SocialNetworkApp.Configs;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SocialNetworkApp.Models.Users;
 
@@ -12,6 +13,12 @@ namespace SocialNetworkApp
             Database.Migrate();
         }
 
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
 
+            builder.ApplyConfiguration(new FriendConfiguration());
+          
+        }
     }
 }

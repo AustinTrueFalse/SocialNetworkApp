@@ -7,6 +7,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SocialNetworkApp.Models.Users;
+using SocialNetworkApp.Repos;
+using SocialNetworkApp.UoW;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,6 +40,9 @@ namespace SocialNetworkApp
             services.AddSingleton(mapper);
 
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connection));
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            services.AddScoped<FriendsRepository>(); // Добавляем FriendsRepository
             services.AddControllersWithViews();
             services.AddIdentity<User, IdentityRole>(opts => {
                 opts.Password.RequiredLength = 5;
@@ -46,7 +51,7 @@ namespace SocialNetworkApp
                 opts.Password.RequireUppercase = false;
                 opts.Password.RequireDigit = false;
             })
-                    .AddEntityFrameworkStores<ApplicationDbContext>();
+            .AddEntityFrameworkStores<ApplicationDbContext>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

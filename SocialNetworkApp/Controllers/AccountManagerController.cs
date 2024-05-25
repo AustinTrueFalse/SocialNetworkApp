@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SocialNetworkApp.Models.Users;
+using SocialNetworkApp.Repos;
 using SocialNetworkApp.UoW;
 using SocialNetworkApp.ViewModels.Account;
 using System;
@@ -20,11 +21,14 @@ namespace SocialNetworkApp.Controllers
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
 
-        public AccountManagerController(UserManager<User> userManager, SignInManager<User> signInManager, IMapper mapper)
+        private IUnitOfWork _unitOfWork;
+
+        public AccountManagerController(UserManager<User> userManager, SignInManager<User> signInManager, IMapper mapper, IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _mapper = mapper;
+            _unitOfWork = unitOfWork;
         }
 
         [Route("Login")]
@@ -51,8 +55,29 @@ namespace SocialNetworkApp.Controllers
 
             var model = new UserViewModel(result);
 
+            model.Friends = await GetAllFriend(model.User);
+
             return View("User", model);
         }
+
+        private async Task<List<User>> GetAllFriend(User user)
+        {
+            var repository = _unitOfWork.GetRepository<Friend>() as FriendsRepository;
+
+            return repository.GetFriendsByUser(user);
+        }
+
+        private async Task<List<User>> GetAllFriend()
+        {
+            var user = User;
+
+            var result = await _userManager.GetUserAsync(user);
+
+            var repository = _unitOfWork.GetRepository<Friend>() as FriendsRepository;
+
+            return repository.GetFriendsByUser(result);
+        }
+
 
 
         [Route("Login")]
@@ -75,7 +100,7 @@ namespace SocialNetworkApp.Controllers
                 }
             }
 
-            // If we got this far, something failed, redisplay form
+        
             return View(model);
         }
 
@@ -88,6 +113,137 @@ namespace SocialNetworkApp.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+       
+
+        [Route("UserList")]
+        [HttpGet]
+        public async Task<IActionResult> UserList(string search)
+        {
+            var model = await CreateSearch(search);
+            return View("UserList", model);
+        }
+
+        [Route("AddFriend")]
+        [HttpPost]
+        public async Task<IActionResult> AddFriend(string id)
+        {
+            var currentuser = User;
+
+            var result = await _userManager.GetUserAsync(currentuser);
+
+            var friend = await _userManager.FindByIdAsync(id);
+
+            var repository = _unitOfWork.GetRepository<Friend>() as FriendsRepository;
+
+            repository.AddFriend(result, friend);
+
+
+            return RedirectToAction("MyPage", "AccountManager");
+        }
+
+        [Route("DeleteFriend")]
+        [HttpPost]
+        public async Task<IActionResult> DeleteFriend(string id)
+        {
+            var currentuser = User;
+
+            var result = await _userManager.GetUserAsync(currentuser);
+
+            var friend = await _userManager.FindByIdAsync(id);
+
+            var repository = _unitOfWork.GetRepository<Friend>() as FriendsRepository;
+
+            repository.DeleteFriend(result, friend);
+
+            return RedirectToAction("MyPage", "AccountManager");
+
+        }
+
+        private async Task<SearchViewModel> CreateSearch(string search)
+        {
+            var currentuser = User;
+
+            var result = await _userManager.GetUserAsync(currentuser);
+
+            var list = _userManager.Users.AsEnumerable().Where(x => x.GetFullName().ToLower().Contains(search.ToLower())).ToList();
+            var withfriend = await GetAllFriend();
+
+            var data = new List<UserWithFriendExt>();
+            list.ForEach(x =>
+            {
+                var t = _mapper.Map<UserWithFriendExt>(x);
+                t.IsFriendWithCurrent = withfriend.Where(y => y.Id == x.Id || x.Id == result.Id).Count() != 0;
+                data.Add(t);
+            });
+
+            var model = new SearchViewModel()
+            {
+                UserList = data
+            };
+
+            return model;
+        }
+
+        [Route("Edit")]
+        [HttpGet]
+        public async Task<IActionResult> Edit()
+        {
+            var user = User;
+            var result = await _userManager.GetUserAsync(user);
+
+            if (result == null)
+            {
+                return NotFound();
+            }
+
+            var editmodel = new UserEditViewModel
+            {
+                UserId = result.Id,
+                FirstName = result.FirstName,
+                LastName = result.LastName,
+                Email = result.Email,
+                BirthDate = result.BirthDate,
+                MiddleName = result.MiddleName,
+                Image = result.Image,
+                Status = result.Status,
+                About = result.About
+            };
+
+            return View("Edit", editmodel);
+        }
+
+        [Authorize]
+        [Route("Update")]
+        [HttpPost]
+        public async Task<IActionResult> Update(UserEditViewModel model)
+        {
+
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByIdAsync(model.UserId);
+
+                user.Convert(model);
+
+                var result = await _userManager.UpdateAsync(user);
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("MyPage", "AccountManager");
+                }
+                else
+                {
+                    return RedirectToAction("Edit", "AccountManager");
+                }
+            }
+            else
+            {
+                ModelState.AddModelError("", "Некорректные данные");
+                return View("Edit", model);
+            }
+
+
+        }
+
+        
 
     }
 }
