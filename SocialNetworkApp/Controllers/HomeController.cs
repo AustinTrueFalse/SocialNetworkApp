@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SocialNetworkApp.Models;
+using SocialNetworkApp.ViewModels.Account;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -18,11 +19,14 @@ namespace SocialNetworkApp.Controllers
             _logger = logger;
         }
 
+        [Route("")]
+        [Route("[controller]/[action]")]
         public IActionResult Index()
         {
-            return View();
+            return View(new MainViewModel());
         }
 
+        [Route("[action]")]
         public IActionResult Privacy()
         {
             return View();
