@@ -40,7 +40,7 @@
         <div class="lined-block">
             <label class="gray-text">Новое сообщение</label>
 
-            <form class="frm" method="post" asp-controller="AccountManager" asp-action="NewMessage"  asp-route-id="@Model.ToWhom.Id">
+            <form class="frm" method="post" asp-controller="AccountManager" asp-action="NewMessage" asp-route-id="@Model.ToWhom.Id" >
                 <div asp-validation-summary="ModelOnly"></div>
                 <div>
                     <div class="mrgn">

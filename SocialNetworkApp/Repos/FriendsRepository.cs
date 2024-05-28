@@ -36,11 +36,14 @@ namespace SocialNetworkApp.Repos
 
         public List<User> GetFriendsByUser(User target)
         {
-            var friends = Set.Include(x => x.CurrentFriend).AsEnumerable().Where(x => x.User.Id == target.Id).Select(x => x.CurrentFriend);
+            var friends = Set.Include(x => x.CurrentFriend)
+                             .Include(x => x.User)
+                             .Where(x => x.UserId == target.Id)
+                             .Select(x => x.CurrentFriend)
+                             .ToList();
 
-            return friends.ToList();
+            return friends;
         }
-
 
         public void DeleteFriend(User target, User Friend)
         {
